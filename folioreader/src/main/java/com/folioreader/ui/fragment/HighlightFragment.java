@@ -1,10 +1,13 @@
 package com.folioreader.ui.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.folioreader.Config;
 import com.folioreader.Constants;
+import com.folioreader.DrawActivity;
 import com.folioreader.FolioReader;
 import com.folioreader.R;
 import com.folioreader.model.HighLight;
@@ -79,6 +83,8 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
 
     @Override
     public void onItemClick(HighlightImpl highlightImpl) {
+//        Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
+        Log.i("Clicked", "clicked");
         Intent intent = new Intent();
         intent.putExtra(HIGHLIGHT_ITEM, highlightImpl);
         intent.putExtra(Constants.TYPE, Constants.HIGHLIGHT_SELECTED);
@@ -95,36 +101,46 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
 
     @Override
     public void editNote(final HighlightImpl highlightImpl, final int position) {
-        final Dialog dialog = new Dialog(getActivity(), R.style.DialogCustomTheme);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_edit_notes);
-        dialog.show();
-        String noteText = highlightImpl.getNote();
-        ((EditText) dialog.findViewById(R.id.edit_note)).setText(noteText);
+        final AlertDialog.Builder choices = new AlertDialog.Builder(getActivity());
+        choices.setTitle("Pick a note type")
+                .setItems(new String[] {"Text", "Draw", "Webview"}, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dial, int which) {
+                // Choose text note
+                if (which == 0) {
+                    final Dialog dialog = new Dialog(getActivity(), R.style.DialogCustomTheme);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_edit_notes);
+                    dialog.show();
+                    String noteText = highlightImpl.getNote();
+                    ((EditText) dialog.findViewById(R.id.edit_note)).setText(noteText);
 
-        dialog.findViewById(R.id.btn_save_note).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String note =
-                        ((EditText) dialog.findViewById(R.id.edit_note)).getText().toString();
-                if (!TextUtils.isEmpty(note)) {
-                    highlightImpl.setNote(note);
-                    if (HighLightTable.updateHighlight(highlightImpl)) {
-                        HighlightUtil.sendHighlightBroadcastEvent(
-                                HighlightFragment.this.getActivity().getApplicationContext(),
-                                highlightImpl,
-                                HighLight.HighLightAction.MODIFY);
-                        adapter.editNote(note, position);
-                    }
-                    dialog.dismiss();
-                } else {
-                    Toast.makeText(getActivity(),
-                            getString(R.string.please_enter_note),
-                            Toast.LENGTH_SHORT).show();
+                    dialog.findViewById(R.id.btn_save_note).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String note =
+                                    ((EditText) dialog.findViewById(R.id.edit_note)).getText().toString();
+                            if (!TextUtils.isEmpty(note)) {
+                                highlightImpl.setNote(note);
+                                if (HighLightTable.updateHighlight(highlightImpl)) {
+                                    HighlightUtil.sendHighlightBroadcastEvent(
+                                            HighlightFragment.this.getActivity().getApplicationContext(),
+                                            highlightImpl,
+                                            HighLight.HighLightAction.MODIFY);
+                                    adapter.editNote(note, position);
+                                }
+                            }
+                            dialog.dismiss();
+                        }
+                    });
+                }
+                // Choose draw note
+                else if (which == 1) {
+                    Intent intent = new Intent(getActivity(), DrawActivity.class);
+                    startActivity(intent);
                 }
             }
         });
+        choices.create().show();
     }
 }
 
