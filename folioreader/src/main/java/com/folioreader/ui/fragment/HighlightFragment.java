@@ -138,6 +138,10 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
                     Intent intent = new Intent(getActivity(), DrawActivity.class);
                     startActivity(intent);
                 }
+                // Choose web view
+                else if (which == 2) {
+                    
+                }
             }
         });
         choices.create().show();
