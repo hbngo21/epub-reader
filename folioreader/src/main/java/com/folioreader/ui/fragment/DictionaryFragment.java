@@ -56,6 +56,9 @@ public class DictionaryFragment extends DialogFragment
     private DictionaryAdapter mAdapter;
     private ImageView imageViewClose;
 
+    private WebView googleWebView;
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +99,12 @@ public class DictionaryFragment extends DialogFragment
         wikiWebView.setWebViewClient(new WebViewClient());
         wikiWebView.getSettings().setJavaScriptEnabled(true);
         wikiWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+
+        googleWebView = (WebView) view.findViewById(R.id.vw_google);
+        googleWebView.getSettings().setLoadsImagesAutomatically(true);
+        googleWebView.setWebViewClient(new WebViewClient());
+        googleWebView.getSettings().setJavaScriptEnabled(true);
+        googleWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
         dictionary.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,15 +193,21 @@ public class DictionaryFragment extends DialogFragment
         dictionary.setSelected(true);
         wikipedia.setSelected(false);
         wikiLayout.setVisibility(View.GONE);
-        dictResults.setVisibility(View.VISIBLE);
-        DictionaryTask task = new DictionaryTask(this);
-        String urlString = null;
-        try {
-            urlString = Constants.DICTIONARY_BASE_URL + URLEncoder.encode(word, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, "-> loadDictionary", e);
-        }
-        task.execute(urlString);
+        googleWebView.setVisibility(View.VISIBLE);
+        String GoogleURL = "https://www.google.com/search?q=" + word;
+        googleWebView.loadUrl(GoogleURL);
+        progressBar.setVisibility(View.GONE);
+
+
+//        dictResults.setVisibility(View.VISIBLE);
+//        DictionaryTask task = new DictionaryTask(this);
+//        String urlString = null;
+//        try {
+//            urlString = Constants.DICTIONARY_BASE_URL + URLEncoder.encode(word, "UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//            Log.e(TAG, "-> loadDictionary", e);
+//        }
+//        task.execute(urlString);
     }
 
     private void loadWikipedia() {
@@ -203,7 +218,8 @@ public class DictionaryFragment extends DialogFragment
         wikiWebView.loadUrl("about:blank");
         mAdapter.clear();
         wikiLayout.setVisibility(View.VISIBLE);
-        dictResults.setVisibility(View.GONE);
+        googleWebView.setVisibility(View.GONE);
+//        Set button color
         dictionary.setSelected(false);
         wikipedia.setSelected(true);
         WikipediaTask task = new WikipediaTask(this);
@@ -220,7 +236,7 @@ public class DictionaryFragment extends DialogFragment
     public void onError() {
         noNetwork.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
-        noNetwork.setText("offline");
+        noNetwork.setText("Not available");
         googleSearch.setVisibility(View.GONE);
     }
 

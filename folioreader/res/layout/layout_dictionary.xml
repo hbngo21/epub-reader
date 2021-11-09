@@ -51,7 +51,7 @@
                     android:background="@drawable/style_back_color_selector"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="@string/dictionary"
+                    android:text="Google"
                     android:textColor="@drawable/content_highlight_text_selector"
                     android:textSize="16sp" />
 
@@ -113,6 +113,12 @@
             android:text="Google search"
             android:visibility="gone"
             tools:visibility="visible" />
+
+        <WebView
+            android:id="@+id/vw_google"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout_margin="8dp" />
 
     </RelativeLayout>
 </RelativeLayout>
