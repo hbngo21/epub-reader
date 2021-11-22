@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
@@ -33,6 +34,8 @@ import com.folioreader.ui.adapter.HighlightAdapter;
 import com.folioreader.util.AppUtil;
 import com.folioreader.util.HighlightUtil;
 import org.greenrobot.eventbus.EventBus;
+import com.folioreader.ui.fragment.DictionaryFragment;
+import com.folioreader.MiniBrowserActivity;
 
 public class HighlightFragment extends Fragment implements HighlightAdapter.HighLightAdapterCallback {
     private static final String HIGHLIGHT_ITEM = "highlight_item";
@@ -140,7 +143,19 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
                 }
                 // Choose web view
                 else if (which == 2) {
-                    
+////                    Intent intent = new Intent(getActivity(), MiniBrowserActivity.class);
+////                    startActivity(intent);
+//                    val dictionaryFragment = DictionaryFragment()
+//                    val bundle = Bundle()
+//                    bundle.putString(Constants.SELECTED_WORD, selectedText?.trim())
+//                    dictionaryFragment.arguments = bundle
+//                    dictionaryFragment.show(parentFragment.fragmentManager!!, DictionaryFragment::class.java.name)
+//                    WebView myWebView = new WebView(getContext());
+//                    setContentView(myWebView);
+                    Intent intent = new Intent(getActivity(), MiniBrowserActivity.class);
+                    String noteText = highlightImpl.getContent();
+                    intent.putExtra("word", noteText);
+                    startActivity(intent);
                 }
             }
         });
