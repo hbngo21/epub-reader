@@ -13,6 +13,8 @@
         android:networkSecurityConfig="@xml/network_security_config"
         tools:replace="android:allowBackup">
         <activity android:name=".DrawActivity"></activity>
+<!--        <activity android:name=".MiniBrowserActivity"></activity>-->
+        <activity android:name=".MiniBrowserActivity"></activity>
 
         <provider
             android:name=".AppContext"
@@ -37,6 +39,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+
     </application>
 
 </manifest>

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
@@ -33,6 +34,8 @@ import com.folioreader.ui.adapter.HighlightAdapter;
 import com.folioreader.util.AppUtil;
 import com.folioreader.util.HighlightUtil;
 import org.greenrobot.eventbus.EventBus;
+import com.folioreader.ui.fragment.DictionaryFragment;
+import com.folioreader.MiniBrowserActivity;
 
 public class HighlightFragment extends Fragment implements HighlightAdapter.HighLightAdapterCallback {
     private static final String HIGHLIGHT_ITEM = "highlight_item";
@@ -149,12 +152,14 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
                 // Choose draw note
                 else if (which == 1) {
                     Intent intent = new Intent(getActivity(), DrawActivity.class);
-//                    startActivity(intent);
                     startActivityForResult(intent, 100);
                 }
                 // Choose web view
                 else if (which == 2) {
-
+                    Intent intent = new Intent(getActivity(), MiniBrowserActivity.class);
+                    String noteText = highlightImpl.getContent();
+                    intent.putExtra("word", noteText);
+                    startActivity(intent);
                 }
                 // Clear note
                 else if (which == 3) {
@@ -176,11 +181,9 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("After intent", "Successfulllllllllllllllllllllllllllllllllllll");
         if (requestCode == 100) {
             if (resultCode == 100) {
                 String note = "<img>" + data.getStringExtra("bitmap");
-//                Toast.makeText(getActivity(), note, Toast.LENGTH_SHORT).show();
                 if (!TextUtils.isEmpty(note)) {
                     curHighlightImpl.setNote(note);
                     if (HighLightTable.updateHighlight(curHighlightImpl)) {
