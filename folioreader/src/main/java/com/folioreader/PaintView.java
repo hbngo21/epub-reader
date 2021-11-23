@@ -1,6 +1,9 @@
 package com.folioreader;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,11 +11,14 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Environment;
 import android.util.AttributeSet;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+import androidx.fragment.app.Fragment;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -254,11 +260,17 @@ public class PaintView extends View {
 
                 Toast.makeText(getContext(), "saved", Toast.LENGTH_LONG).show();
 
+                Intent intent = new Intent();
+                intent.putExtra("bitmap", BitMapToString(mBitmap));
+                Activity acti = getActivity();
+                if (acti != null) {
+                    acti.setResult(100, intent);
+                    acti.finish();
+                }
+
             } catch (FileNotFoundException e) {
 
-
             } catch (IOException e) {
-
 
             }
 
@@ -266,4 +278,22 @@ public class PaintView extends View {
 
     }
 
+    private Activity getActivity() {
+        Context context = getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                return (Activity)context;
+            }
+            context = ((ContextWrapper)context).getBaseContext();
+        }
+        return null;
+    }
+
+    public String BitMapToString(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String temp = Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
+    }
 }

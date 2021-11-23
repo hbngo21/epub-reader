@@ -39,6 +39,8 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
     private View mRootView;
     private HighlightAdapter adapter;
     private String mBookId;
+    private HighlightImpl curHighlightImpl;
+    private int curPosition;
 
 
     public static HighlightFragment newInstance(String bookId, String epubTitle) {
@@ -101,9 +103,20 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
 
     @Override
     public void editNote(final HighlightImpl highlightImpl, final int position) {
+        this.curHighlightImpl = highlightImpl;
+        this.curPosition = position;
         final AlertDialog.Builder choices = new AlertDialog.Builder(getActivity());
+//        String text = highlightImpl.getNote();
+//        String[] choiceArr = {};
+//        TextUtils.isEmpty(text) ? new String[] {"Text", "Draw", "Webview", "Clear note"};
+//        if (text.length() == 0) {
+//            choiceArr = new String[] {"Text", "Draw", "Webview", "Clear note"};
+//        }
+//        else if (text.length() <= 5) {
+//            choiceArr = new String[] {"Text", "Draw", "Webview", "Clear note"};
+//        }
         choices.setTitle("Pick a note type")
-                .setItems(new String[] {"Text", "Draw", "Webview"}, new DialogInterface.OnClickListener() {
+                .setItems(new String[] {"Text", "Draw", "Webview", "Clear note"}, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dial, int which) {
                 // Choose text note
                 if (which == 0) {
@@ -117,34 +130,69 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
                     dialog.findViewById(R.id.btn_save_note).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String note =
-                                    ((EditText) dialog.findViewById(R.id.edit_note)).getText().toString();
-                            if (!TextUtils.isEmpty(note)) {
-                                highlightImpl.setNote(note);
-                                if (HighLightTable.updateHighlight(highlightImpl)) {
-                                    HighlightUtil.sendHighlightBroadcastEvent(
-                                            HighlightFragment.this.getActivity().getApplicationContext(),
-                                            highlightImpl,
-                                            HighLight.HighLightAction.MODIFY);
-                                    adapter.editNote(note, position);
-                                }
+                        String note =
+                                ((EditText) dialog.findViewById(R.id.edit_note)).getText().toString();
+                        if (!TextUtils.isEmpty(note)) {
+                            highlightImpl.setNote(note);
+                            if (HighLightTable.updateHighlight(highlightImpl)) {
+                                HighlightUtil.sendHighlightBroadcastEvent(
+                                        HighlightFragment.this.getActivity().getApplicationContext(),
+                                        highlightImpl,
+                                        HighLight.HighLightAction.MODIFY);
+                                adapter.editNote(note, position);
                             }
-                            dialog.dismiss();
+                        }
+                        dialog.dismiss();
                         }
                     });
                 }
                 // Choose draw note
                 else if (which == 1) {
                     Intent intent = new Intent(getActivity(), DrawActivity.class);
-                    startActivity(intent);
+//                    startActivity(intent);
+                    startActivityForResult(intent, 100);
                 }
                 // Choose web view
                 else if (which == 2) {
-                    
+
+                }
+                // Clear note
+                else if (which == 3) {
+                    String note = "";
+                    highlightImpl.setNote(note);
+                    if (HighLightTable.updateHighlight(highlightImpl)) {
+                        HighlightUtil.sendHighlightBroadcastEvent(
+                                HighlightFragment.this.getActivity().getApplicationContext(),
+                                highlightImpl,
+                                HighLight.HighLightAction.MODIFY);
+                        adapter.editNote(note, position);
+                    }
                 }
             }
         });
         choices.create().show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("After intent", "Successfulllllllllllllllllllllllllllllllllllll");
+        if (requestCode == 100) {
+            if (resultCode == 100) {
+                String note = "<img>" + data.getStringExtra("bitmap");
+//                Toast.makeText(getActivity(), note, Toast.LENGTH_SHORT).show();
+                if (!TextUtils.isEmpty(note)) {
+                    curHighlightImpl.setNote(note);
+                    if (HighLightTable.updateHighlight(curHighlightImpl)) {
+                        HighlightUtil.sendHighlightBroadcastEvent(
+                                HighlightFragment.this.getActivity().getApplicationContext(),
+                                curHighlightImpl,
+                                HighLight.HighLightAction.MODIFY);
+                        adapter.editNote(note, curPosition);
+                    }
+                }
+            }
+        }
     }
 }
 

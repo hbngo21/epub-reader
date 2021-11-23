@@ -1,7 +1,10 @@
 package com.folioreader.ui.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.Html;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +42,18 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
     public HighlightHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new HighlightHolder(LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_highlight, parent, false));
+    }
+
+    public Bitmap StringToBitMap(String encodedString) {
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0,
+                    encodeByte.length);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
     }
 
     @Override
@@ -84,12 +99,33 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         if (getItem(position).getNote() != null) {
             if (getItem(position).getNote().isEmpty()) {
                 holder.note.setVisibility(View.GONE);
+                holder.illust.setVisibility(View.GONE);
             } else {
-                holder.note.setVisibility(View.VISIBLE);
-                holder.note.setText(getItem(position).getNote());
+                String curNote = getItem(position).getNote();
+                if (curNote.length() > 5) {
+//                    curNote = curNote.substring(0, 5);
+//                    curNote = Integer.toString(curNote.compareTo("<img>"));
+                    if (curNote.substring(0, 5).compareTo("<img>") == 0) {
+                        curNote = curNote.substring(5);
+                        holder.note.setVisibility(View.GONE);
+                        holder.illust.setVisibility(View.VISIBLE);
+                        Bitmap bitm = StringToBitMap(curNote);
+                        holder.illust.setImageBitmap(bitm);
+                    } else {
+                        holder.note.setVisibility(View.VISIBLE);
+                        holder.illust.setVisibility(View.GONE);
+                        holder.note.setText(curNote);
+                    }
+                }
+                else {
+                    holder.note.setVisibility(View.VISIBLE);
+                    holder.illust.setVisibility(View.GONE);
+                    holder.note.setText(curNote);
+                }
             }
         } else {
             holder.note.setVisibility(View.GONE);
+            holder.illust.setVisibility(View.GONE);
         }
         holder.container.postDelayed(new Runnable() {
             @Override
@@ -147,6 +183,7 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         private TextView date;
         private RelativeLayout container;
         private TextView note;
+        private ImageView illust;
         private LinearLayout swipeLinearLayout;
 
         HighlightHolder(View itemView) {
@@ -158,6 +195,7 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
             editNote = (ImageView) itemView.findViewById(R.id.iv_edit_note);
             date = (TextView) itemView.findViewById(R.id.tv_highlight_date);
             note = (TextView) itemView.findViewById(R.id.tv_note);
+            illust = (ImageView) itemView.findViewById(R.id.iv_note);
         }
     }
 

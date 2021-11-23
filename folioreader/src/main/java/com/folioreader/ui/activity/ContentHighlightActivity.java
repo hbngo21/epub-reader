@@ -1,9 +1,11 @@
 package com.folioreader.ui.activity;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -117,4 +119,14 @@ public class ContentHighlightActivity extends AppCompatActivity {
         ft.commit();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("After intent", "Successfulllllllllllllllllllllllllllllllllllll");
+        if (requestCode == 100) {
+            if (resultCode == 100) {
+                Log.i("After intent", "Successfulllllllllllllllllllllllllllllllllllll");
+            }
+        }
+    }
 }
