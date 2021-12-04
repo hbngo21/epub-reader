@@ -159,7 +159,7 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
                     Intent intent = new Intent(getActivity(), MiniBrowserActivity.class);
                     String noteText = highlightImpl.getContent();
                     intent.putExtra("word", noteText);
-                    startActivity(intent);
+                    startActivityForResult(intent, 200);
                 }
                 // Clear note
                 else if (which == 3) {
@@ -195,6 +195,9 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
                     }
                 }
             }
+        }
+        if (requestCode == 200){
+
         }
     }
 }
