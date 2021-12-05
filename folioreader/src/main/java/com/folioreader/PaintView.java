@@ -40,6 +40,7 @@ public class PaintView extends View {
     private int backgroundColor = DEFAULT_BG_COLOR;
     private int strokeWidth;
     private Bitmap mBitmap;
+    private Bitmap curBit = null;
     private Canvas mCanvas;
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
@@ -91,9 +92,14 @@ public class PaintView extends View {
         if (bitmap != null) {
 //                Bitmap bit = StringToBitMap(bitmap.substring(5));
                 Bitmap bit = BitmapFactory.decodeFile(bitmap);
+                curBit = bit;
                 backgroundColor = DEFAULT_BG_COLOR;
                 mCanvas.drawColor(backgroundColor);
                 mCanvas.drawBitmap(bit, 0, 0, null);
+        }
+        else {
+            backgroundColor = DEFAULT_BG_COLOR;
+            mCanvas.drawColor(backgroundColor);
         }
 
         currentColor = DEFAULT_COLOR;
@@ -106,7 +112,9 @@ public class PaintView extends View {
     protected void onDraw(Canvas canvas) {
 
         canvas.save();
-//        mCanvas.drawColor(backgroundColor); // WRONG
+        mCanvas.drawColor(backgroundColor); // WRONG
+        if (curBit != null)
+            mCanvas.drawBitmap(curBit, 0, 0, null);
 
         for (Draw draw : paths) {
 
