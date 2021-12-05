@@ -91,6 +91,8 @@ public class PaintView extends View {
         if (bitmap != null) {
 //                Bitmap bit = StringToBitMap(bitmap.substring(5));
                 Bitmap bit = BitmapFactory.decodeFile(bitmap);
+                backgroundColor = DEFAULT_BG_COLOR;
+                mCanvas.drawColor(backgroundColor);
                 mCanvas.drawBitmap(bit, 0, 0, null);
         }
 
