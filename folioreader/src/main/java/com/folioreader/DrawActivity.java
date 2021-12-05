@@ -45,7 +45,7 @@ public class DrawActivity extends AppCompatActivity {
 
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        paintView.initialise(displayMetrics);
+        paintView.initialise(displayMetrics, getIntent().getStringExtra("bitmap"));
 
         textView.setText("Pen size: " + seekBar.getProgress());
 

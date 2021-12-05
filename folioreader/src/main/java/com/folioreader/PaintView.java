@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -67,13 +68,31 @@ public class PaintView extends View {
 
     }
 
-    public void initialise (DisplayMetrics displayMetrics) {
+    public Bitmap StringToBitMap(String encodedString) {
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0,
+                    encodeByte.length);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
+    public void initialise (DisplayMetrics displayMetrics, String bitmap) {
 
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+
+        if (bitmap != null) {
+//                Bitmap bit = StringToBitMap(bitmap.substring(5));
+                Bitmap bit = BitmapFactory.decodeFile(bitmap);
+                mCanvas.drawBitmap(bit, 0, 0, null);
+        }
 
         currentColor = DEFAULT_COLOR;
         strokeWidth = BRUSH_SIZE;
@@ -85,7 +104,7 @@ public class PaintView extends View {
     protected void onDraw(Canvas canvas) {
 
         canvas.save();
-        mCanvas.drawColor(backgroundColor); // WRONG
+//        mCanvas.drawColor(backgroundColor); // WRONG
 
         for (Draw draw : paths) {
 
@@ -169,6 +188,7 @@ public class PaintView extends View {
     public void clear () {
 
         backgroundColor = DEFAULT_BG_COLOR;
+        mCanvas.drawColor(backgroundColor);
 
         paths.clear();
         invalidate();
@@ -221,32 +241,36 @@ public class PaintView extends View {
 
         int count = 0;
 
-        File sdDirectory = Environment.getExternalStorageDirectory();
-        File subDirectory = new File(sdDirectory.toString() + "/Pictures/Paint");
+//        File sdDirectory = Environment.getExternalStorageDirectory();
+//        File subDirectory = new File(sdDirectory.toString() + "/Pictures/Paint");
+//
+//        if (subDirectory.exists()) {
+//
+//            File[] existing = subDirectory.listFiles();
+//
+//            for (File file : existing) {
+//
+//                if (file.getName().endsWith(".jpg") || file.getName().endsWith(".png")) {
+//
+//                    count++;
+//
+//                }
+//
+//            }
+//
+//        } else {
+//
+//            subDirectory.mkdir();
+//
+//        }
+        String mPath = getActivity().getApplicationContext().getExternalFilesDir(null) + "/epubviewer/draw.jpg";
+        File image = new File(mPath);
+        if (!image.exists())
+            image.getParentFile().mkdir();
 
-        if (subDirectory.exists()) {
-
-            File[] existing = subDirectory.listFiles();
-
-            for (File file : existing) {
-
-                if (file.getName().endsWith(".jpg") || file.getName().endsWith(".png")) {
-
-                    count++;
-
-                }
-
-            }
-
-        } else {
-
-            subDirectory.mkdir();
-
-        }
-
-        if (subDirectory.exists()) {
-
-            File image = new File(subDirectory, "/drawing_" + (count + 1) + ".png");
+//        if (subDirectory.exists()) {
+//
+//            File image = new File(subDirectory, "/drawing_" + (count + 1) + ".png");
             FileOutputStream fileOutputStream;
 
             try {
@@ -258,10 +282,8 @@ public class PaintView extends View {
                 fileOutputStream.flush();
                 fileOutputStream.close();
 
-                Toast.makeText(getContext(), "saved", Toast.LENGTH_LONG).show();
-
                 Intent intent = new Intent();
-                intent.putExtra("bitmap", BitMapToString(mBitmap));
+                intent.putExtra("bitmap", mPath);
                 Activity acti = getActivity();
                 if (acti != null) {
                     acti.setResult(100, intent);
@@ -273,8 +295,6 @@ public class PaintView extends View {
             } catch (IOException e) {
 
             }
-
-        }
 
     }
 

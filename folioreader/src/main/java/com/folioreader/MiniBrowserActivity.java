@@ -65,7 +65,7 @@ public class MiniBrowserActivity extends AppCompatActivity {
         webSettings.setLoadsImagesAutomatically(true);
         this.webView.setWebViewClient(new WebViewClient());
 
-        Intent intent=getIntent();
+        Intent intent = getIntent();
         String note;
         note = intent.getStringExtra("word");
         String GoogleURL = "https://www.google.com/search?q=" + note;
@@ -76,6 +76,7 @@ public class MiniBrowserActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 takeScreenshot();
+                finish();
             }
         });
     }
@@ -100,20 +101,23 @@ public class MiniBrowserActivity extends AppCompatActivity {
     }
 
     private void takeScreenshot() {
-        Date now = new Date();
-        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+//        Date now = new Date();
+//        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
 
         try {
             // image naming and path  to include sd card  appending name you choose for file
-            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
+            String mPath = getApplicationContext().getExternalFilesDir(null) + "/epubviewer/web.jpg";
 
             // create bitmap screen capture
             View v1 = this.webView;
             v1.setDrawingCacheEnabled(true);
             Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
             v1.setDrawingCacheEnabled(false);
+            this.webView.getSettings().setJavaScriptEnabled(false);
 
             File imageFile = new File(mPath);
+            if (!imageFile.exists())
+                imageFile.getParentFile().mkdir();
 
             FileOutputStream outputStream = new FileOutputStream(imageFile);
             int quality = 100;
@@ -122,10 +126,9 @@ public class MiniBrowserActivity extends AppCompatActivity {
             outputStream.close();
 
             Intent intent = new Intent();
-            intent.putExtra("bitmap", BitMapToString(mBitmap));
+            intent.putExtra("bitmap", mPath);
+
             MiniBrowserActivity.this.setResult(200, intent);
-            MiniBrowserActivity.this.finish();
-            //openScreenshot(imageFile);
         } catch (Throwable e) {
             // Several error may come out with file handling or DOM
             e.printStackTrace();

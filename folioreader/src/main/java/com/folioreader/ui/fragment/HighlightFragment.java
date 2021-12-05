@@ -5,8 +5,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +39,10 @@ import com.folioreader.util.HighlightUtil;
 import org.greenrobot.eventbus.EventBus;
 import com.folioreader.ui.fragment.DictionaryFragment;
 import com.folioreader.MiniBrowserActivity;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 
 public class HighlightFragment extends Fragment implements HighlightAdapter.HighLightAdapterCallback {
     private static final String HIGHLIGHT_ITEM = "highlight_item";
@@ -109,15 +116,7 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
         this.curHighlightImpl = highlightImpl;
         this.curPosition = position;
         final AlertDialog.Builder choices = new AlertDialog.Builder(getActivity());
-//        String text = highlightImpl.getNote();
-//        String[] choiceArr = {};
-//        TextUtils.isEmpty(text) ? new String[] {"Text", "Draw", "Webview", "Clear note"};
-//        if (text.length() == 0) {
-//            choiceArr = new String[] {"Text", "Draw", "Webview", "Clear note"};
-//        }
-//        else if (text.length() <= 5) {
-//            choiceArr = new String[] {"Text", "Draw", "Webview", "Clear note"};
-//        }
+
         choices.setTitle("Pick a note type")
                 .setItems(new String[] {"Text", "Draw", "Webview", "Clear note"}, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dial, int which) {
@@ -152,6 +151,31 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
                 // Choose draw note
                 else if (which == 1) {
                     Intent intent = new Intent(getActivity(), DrawActivity.class);
+                    String noteText = highlightImpl.getNote();
+                    if (noteText != null) {
+                        if (noteText.length() > 5) {
+                            if (noteText.substring(0, 5).compareTo("<img>") == 0) {
+                                Bitmap bit = StringToBitMap(noteText.substring(5));
+
+                                String mPath = getActivity().getApplicationContext().getExternalFilesDir(null) + "/epubviewer/draw.jpg";
+                                File imageFile = new File(mPath);
+                                if (!imageFile.exists())
+                                    imageFile.getParentFile().mkdir();
+                                try {
+                                    FileOutputStream outputStream = new FileOutputStream(imageFile);
+                                    int quality = 100;
+                                    bit.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+                                    outputStream.flush();
+                                    outputStream.close();
+
+                                    intent.putExtra("bitmap", mPath);
+                                } catch (Throwable e) {
+                                    // Several error may come out with file handling or DOM
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
                     startActivityForResult(intent, 100);
                 }
                 // Choose web view
@@ -183,7 +207,9 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
             if (resultCode == 100) {
-                String note = "<img>" + data.getStringExtra("bitmap");
+                String note = data.getStringExtra("bitmap");
+                Bitmap bit = BitmapFactory.decodeFile(note);
+                note = "<img>" + BitMapToString(bit);
                 if (!TextUtils.isEmpty(note)) {
                     curHighlightImpl.setNote(note);
                     if (HighLightTable.updateHighlight(curHighlightImpl)) {
@@ -196,9 +222,34 @@ public class HighlightFragment extends Fragment implements HighlightAdapter.High
                 }
             }
         }
-        if (requestCode == 200){
-
+        else if (requestCode == 200){
+            if (resultCode == 200) {
+                String img = data.getStringExtra("bitmap");
+                Intent intent = new Intent(getActivity(), DrawActivity.class);
+                intent.putExtra("bitmap", img);
+                startActivityForResult(intent, 100);
+            }
         }
+    }
+
+    public Bitmap StringToBitMap(String encodedString) {
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0,
+                    encodeByte.length);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
+    public String BitMapToString(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String temp = Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
     }
 }
 
