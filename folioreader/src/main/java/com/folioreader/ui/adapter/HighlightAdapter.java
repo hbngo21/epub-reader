@@ -1,8 +1,10 @@
 package com.folioreader.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.text.Html;
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -11,14 +13,18 @@ import android.view.ViewGroup;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import com.folioreader.Config;
+import com.folioreader.DrawActivity;
 import com.folioreader.R;
 import com.folioreader.model.HighlightImpl;
 import com.folioreader.ui.view.UnderlinedTextView;
 import com.folioreader.util.AppUtil;
 import com.folioreader.util.UiUtil;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
 
 /**
@@ -103,14 +109,39 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
             } else {
                 String curNote = getItem(position).getNote();
                 if (curNote.length() > 5) {
-//                    curNote = curNote.substring(0, 5);
-//                    curNote = Integer.toString(curNote.compareTo("<img>"));
                     if (curNote.substring(0, 5).compareTo("<img>") == 0) {
                         curNote = curNote.substring(5);
                         holder.note.setVisibility(View.GONE);
                         holder.illust.setVisibility(View.VISIBLE);
-                        Bitmap bitm = StringToBitMap(curNote);
+                        final Bitmap bitm = StringToBitMap(curNote);
                         holder.illust.setImageBitmap(bitm);
+
+                        // View image on click
+                        holder.illust.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String mPath = context.getApplicationContext().getExternalFilesDir(null) + "/epubviewer/view.jpg";
+                                File imageFile = new File(mPath);
+                                if (!imageFile.exists())
+                                    imageFile.getParentFile().mkdir();
+                                try {
+                                    FileOutputStream outputStream = new FileOutputStream(imageFile);
+                                    int quality = 100;
+                                    bitm.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+                                    outputStream.flush();
+                                    outputStream.close();
+
+                                    Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", imageFile);
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setDataAndType(uri, "image/*");
+                                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    context.startActivity(intent);
+                                } catch (Throwable e) {
+                                    // Several error may come out with file handling or DOM
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     } else {
                         holder.note.setVisibility(View.VISIBLE);
                         holder.illust.setVisibility(View.GONE);
