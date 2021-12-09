@@ -1,4 +1,4 @@
-package com.folioreader;
+package com.folioreader.ui.view;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,14 +10,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
-import androidx.fragment.app.Fragment;
+
+import com.folioreader.util.Draw;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -249,38 +249,10 @@ public class PaintView extends View {
 
     public void saveImage () {
 
-        int count = 0;
-
-//        File sdDirectory = Environment.getExternalStorageDirectory();
-//        File subDirectory = new File(sdDirectory.toString() + "/Pictures/Paint");
-//
-//        if (subDirectory.exists()) {
-//
-//            File[] existing = subDirectory.listFiles();
-//
-//            for (File file : existing) {
-//
-//                if (file.getName().endsWith(".jpg") || file.getName().endsWith(".png")) {
-//
-//                    count++;
-//
-//                }
-//
-//            }
-//
-//        } else {
-//
-//            subDirectory.mkdir();
-//
-//        }
         String mPath = getActivity().getApplicationContext().getExternalFilesDir(null) + "/epubviewer/draw.jpg";
         File image = new File(mPath);
         if (!image.exists())
             image.getParentFile().mkdir();
-
-//        if (subDirectory.exists()) {
-//
-//            File image = new File(subDirectory, "/drawing_" + (count + 1) + ".png");
             FileOutputStream fileOutputStream;
 
             try {

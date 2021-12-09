@@ -16,7 +16,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import com.folioreader.Config;
-import com.folioreader.DrawActivity;
 import com.folioreader.R;
 import com.folioreader.model.HighlightImpl;
 import com.folioreader.ui.view.UnderlinedTextView;

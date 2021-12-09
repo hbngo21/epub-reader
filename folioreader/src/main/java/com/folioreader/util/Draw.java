@@ -1,4 +1,4 @@
-package com.folioreader;
+package com.folioreader.util;
 
 import android.graphics.Path;
 

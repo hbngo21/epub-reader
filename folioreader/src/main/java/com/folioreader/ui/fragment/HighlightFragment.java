@@ -15,9 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.webkit.WebView;
 import android.widget.EditText;
-import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -26,7 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.folioreader.Config;
 import com.folioreader.Constants;
-import com.folioreader.DrawActivity;
+import com.folioreader.ui.activity.DrawActivity;
 import com.folioreader.FolioReader;
 import com.folioreader.R;
 import com.folioreader.model.HighLight;
@@ -37,10 +36,8 @@ import com.folioreader.ui.adapter.HighlightAdapter;
 import com.folioreader.util.AppUtil;
 import com.folioreader.util.HighlightUtil;
 import org.greenrobot.eventbus.EventBus;
-import org.w3c.dom.Text;
 
-import com.folioreader.ui.fragment.DictionaryFragment;
-import com.folioreader.MiniBrowserActivity;
+import com.folioreader.ui.activity.MiniBrowserActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

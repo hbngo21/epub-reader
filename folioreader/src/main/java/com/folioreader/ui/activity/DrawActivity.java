@@ -1,4 +1,4 @@
-package com.folioreader;
+package com.folioreader.ui.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,7 +22,8 @@ import android.widget.Toast;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 
-import android.os.Bundle;
+import com.folioreader.R;
+import com.folioreader.ui.view.PaintView;
 
 public class DrawActivity extends AppCompatActivity {
     private PaintView paintView;
